@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from 'motion/react'
-import { ArrowLeft, ArrowRight, BookOpen } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Sparkles } from 'lucide-react'
 import type { Kanda } from '../data/story'
 import Scene from './Scene'
 
@@ -7,50 +7,45 @@ export default function Chapter({ k, onPrev, onNext }: { k: Kanda; onPrev?: () =
   const reduced = useReducedMotion()
 
   return (
-    <section id={`k${k.id}`} data-k={k.id} className="chapter-section" aria-labelledby={`chapter-title-${k.id}`}>
-      <div className="chapter-backdrop" aria-hidden="true">
-        <Scene k={k} />
-        <div className="chapter-shade" />
-      </div>
-
-      <div className="chapter-content">
-        <div className="chapter-heading">
-          <p className="eyebrow">CHAPTER {String(k.id).padStart(2, '0')} <span>·</span> 07</p>
-          <motion.p className="chapter-number" initial={reduced ? false : { opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>THE RAMAYANA</motion.p>
-          <motion.h2
-            id={`chapter-title-${k.id}`}
-            className="deva chapter-title"
-            initial={reduced ? false : { opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.9 }}
-          >{k.hi}</motion.h2>
-          <p className="chapter-english">{k.en}</p>
-          <p className="chapter-quote">“{k.line}”</p>
-          <span className="heading-ornament" aria-hidden="true">✦</span>
-        </div>
-
-        <div className="story-list" aria-label={`${k.en} story`}>
-          {k.beats.map((beat, index) => (
-            <motion.article
-              key={`${k.id}-${index}`}
-              className="story-beat"
-              initial={reduced ? false : { opacity: 0, y: 28 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.18 }}
-              transition={{ duration: 0.7, delay: reduced ? 0 : 0.04 }}
-            >
-              <div className="beat-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</div>
-              <div className="beat-copy"><p>{beat}</p></div>
-            </motion.article>
-          ))}
-        </div>
-
-        <div className="chapter-footer">
-          {onPrev ? <button className="outline-action" onClick={onPrev}><ArrowLeft size={16} /> Previous Kanda</button> : <span className="chapter-begin-note"><BookOpen size={15} /> The journey begins</span>}
-          <button className="primary-action" onClick={onNext}>{k.id === 7 ? 'Enter the Diwali finale' : 'Continue the journey'} <ArrowRight size={16} /></button>
-        </div>
-      </div>
+    <section id={`k${k.id}`} data-k={k.id} className="cinema-chapter" aria-label={`${k.en} cinematic chapter`}>
+      {k.beats.map((beat, index) => (
+        <article className="cinema-frame" key={`${k.id}-scene-${index}`}>
+          <Scene k={k} sceneIndex={index} />
+          <div className="cinema-vignette" aria-hidden="true" />
+          <div className="cinema-topline">
+            <span>श्री रामायण</span>
+            <span>CHAPTER {String(k.id).padStart(2, '0')} <i>✦</i> SCENE {String(index + 1).padStart(2, '0')}</span>
+          </div>
+          <motion.div
+            className="cinema-caption"
+            initial={reduced ? false : { opacity: 0, y: 38, filter: 'blur(8px)' }}
+            whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            viewport={{ amount: 0.35 }}
+            transition={{ duration: reduced ? 0 : 1, ease: [0.2, 0.75, 0.2, 1] }}
+          >
+            {index === 0 && <>
+              <p className="cinema-kicker"><Sparkles size={13} /> THE RAMAYANA · SEVEN KANDAS</p>
+              <h2 className="deva cinema-title">{k.hi}</h2>
+              <p className="cinema-subtitle">{k.en}</p>
+              <p className="cinema-theme">“{k.line}”</p>
+            </>}
+            <div className="cinema-story-row">
+              <span className="cinema-scene-count">{String(index + 1).padStart(2, '0')} <i>/</i> {String(k.beats.length).padStart(2, '0')}</span>
+              <p className="cinema-story">{beat}</p>
+            </div>
+            <div className="cinema-progress" aria-label={`Scene ${index + 1} of ${k.beats.length}`}>
+              {k.beats.map((_, i) => <span key={i} className={i <= index ? 'is-past' : ''} />)}
+            </div>
+            {index === k.beats.length - 1 && (
+              <div className="cinema-actions">
+                {onPrev && <button className="cinema-secondary" onClick={onPrev}><ArrowLeft size={15} /> Previous Kanda</button>}
+                <button className="cinema-primary" onClick={onNext}>{k.id === 7 ? 'See the festival of light' : 'Next chapter'} <ArrowRight size={16} /></button>
+              </div>
+            )}
+          </motion.div>
+          {index < k.beats.length - 1 && <div className="cinema-scroll-hint" aria-hidden="true"><span /> SCROLL TO CONTINUE</div>}
+        </article>
+      ))}
     </section>
   )
 }
