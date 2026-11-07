@@ -21,7 +21,7 @@ function Opening({ onDone, reduced }: { onDone: () => void; reduced: boolean }) 
   const ignite = () => {
     if (lit) return
     setLit(true)
-    if (reduced) { setPhase(3); return }
+    if (reduced) { setPhase(3); onDone(); return }
     timer.current.push(window.setTimeout(() => setPhase(1), 1800))
     timer.current.push(window.setTimeout(() => setPhase(2), 6200))
     timer.current.push(window.setTimeout(() => setPhase(3), 10000))
